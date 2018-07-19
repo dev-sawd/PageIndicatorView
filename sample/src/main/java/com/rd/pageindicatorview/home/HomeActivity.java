@@ -3,12 +3,14 @@ package com.rd.pageindicatorview.home;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
+
 import com.rd.PageIndicatorView;
 import com.rd.pageindicatorview.base.BaseActivity;
+import com.rd.pageindicatorview.base.BaseFragment;
 import com.rd.pageindicatorview.customize.CustomizeActivity;
 import com.rd.pageindicatorview.data.Customization;
 import com.rd.pageindicatorview.sample.R;
@@ -21,6 +23,7 @@ public class HomeActivity extends BaseActivity {
 
     private PageIndicatorView pageIndicatorView;
     private Customization customization;
+    private ViewPager viewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,32 +64,27 @@ public class HomeActivity extends BaseActivity {
 
     @SuppressWarnings("ConstantConditions")
     private void initViews() {
-        HomeAdapter adapter = new HomeAdapter();
-        adapter.setData(createPageList());
-
-        final ViewPager pager = findViewById(R.id.viewPager);
-        pager.setAdapter(adapter);
+        viewPager = findViewById(R.id.viewPager);
+        HomeFragmentAdapter homeFragmentAdapter = new HomeFragmentAdapter(getSupportFragmentManager());
+        homeFragmentAdapter.setData(createPageList());
+        viewPager.setAdapter(homeFragmentAdapter);
 
         pageIndicatorView = findViewById(R.id.pageIndicatorView);
     }
 
     @NonNull
-    private List<View> createPageList() {
-        List<View> pageList = new ArrayList<>();
-        pageList.add(createPageView(R.color.google_red));
-        pageList.add(createPageView(R.color.google_blue));
-        pageList.add(createPageView(R.color.google_yellow));
-        pageList.add(createPageView(R.color.google_green));
+    private List<Fragment> createPageList() {
+        int[] colors = {R.color.google_red, R.color.google_yellow, R.color.google_green, R.color.google_blue};
+        List<Fragment> pageList = new ArrayList<>();
+        for(int i = 0; i < 4; i++) {
+            BaseFragment baseFragment = new BaseFragment();
+            Bundle bundle = new Bundle();
+            bundle.putInt(BaseFragment.BACKGROUND_COLOR, colors[i]);
+            baseFragment.setArguments(bundle);
+            pageList.add(baseFragment);
+        }
 
         return pageList;
-    }
-
-    @NonNull
-    private View createPageView(int color) {
-        View view = new View(this);
-        view.setBackgroundColor(getResources().getColor(color));
-
-        return view;
     }
 
     private void updateIndicator() {
